@@ -1,14 +1,5 @@
 {
   "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
-  "assists": {
-    "enabled": true,
-    "actions": {
-      "source": {
-        "useSortedKeys": "on",
-        "sortJsxProps": "on"
-      }
-    }
-  },
   "vcs": { "enabled": false, "clientKind": "git", "useIgnoreFile": false },
   "files": { "ignoreUnknown": false, "ignore": [] },
   "formatter": {

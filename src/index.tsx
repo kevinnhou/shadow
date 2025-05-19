@@ -24,6 +24,7 @@ interface Preferences {
 interface FormValues {
   query: string
   image: string[]
+  depth: string
 }
 
 const preferences = getPreferenceValues<Preferences>()
@@ -57,6 +58,7 @@ export default function Query() {
     initialValues: {
       query: "",
       image: [],
+      depth: "quick",
     },
     async onSubmit(values) {
       const RATE_LIMIT_MS = 5000
@@ -64,7 +66,9 @@ export default function Query() {
 
       if (now - lastRequestTime < RATE_LIMIT_MS) {
         setResult(
-          `Rate limit exceeded. Please wait ${Math.ceil((lastRequestTime + RATE_LIMIT_MS - now) / 1000)} seconds before making another request.`,
+          `Rate limit exceeded. Please wait ${Math.ceil(
+            (lastRequestTime + RATE_LIMIT_MS - now) / 1000,
+          )} seconds before making another request.`,
         )
         return
       }
@@ -75,6 +79,31 @@ export default function Query() {
       const google = createGoogleGenerativeAI({
         apiKey: preferences.geminiApiKey,
       })
+
+      let modelName = "gemini-2.5-flash-preview-04-17"
+      let providerOpts:
+        | { google?: GoogleGenerativeAIProviderOptions }
+        | undefined = {
+        google: {
+          thinkingConfig: {
+            thinkingBudget: 1000,
+          },
+        },
+      }
+
+      if (values.depth === "quick") {
+        modelName = "gemini-2.0-flash"
+        providerOpts = undefined
+      } else if (values.depth === "deep") {
+        providerOpts = {
+          google: {
+            thinkingConfig: {
+              thinkingBudget: 2000,
+              includeThoughts: true,
+            },
+          },
+        }
+      }
 
       try {
         const messages: {
@@ -100,15 +129,11 @@ export default function Query() {
         }
 
         const { text } = await generateText({
-          model: google("gemini-2.5-flash-preview-04-17"),
+          model: google(
+            modelName as "gemini-2.0-flash" | "gemini-2.5-flash-preview-04-17",
+          ),
           messages: messages,
-          providerOptions: {
-            google: {
-              thinkingConfig: {
-                thinkingBudget: 1000,
-              },
-            } satisfies GoogleGenerativeAIProviderOptions,
-          },
+          providerOptions: providerOpts,
         })
 
         setResult(text)
@@ -124,6 +149,7 @@ export default function Query() {
     },
     validation: {
       query: FormValidation.Required,
+      depth: FormValidation.Required,
     },
   })
 
@@ -163,6 +189,11 @@ export default function Query() {
         storeValue={false}
         {...itemProps.image}
       />
+      <Form.Dropdown title="Depth" {...itemProps.depth}>
+        <Form.Dropdown.Item value="quick" title="Quick" />
+        <Form.Dropdown.Item value="balanced" title="Balanced" />
+        <Form.Dropdown.Item value="deep" title="Deep" />
+      </Form.Dropdown>
     </Form>
   )
 }
