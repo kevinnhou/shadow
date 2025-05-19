@@ -1,0 +1,60 @@
+{
+  "$schema": "https://www.raycast.com/schemas/extension.json",
+  "name": "shadow",
+  "title": "shadow",
+  "description": "silent, invisible and undetectable",
+  "icon": "extension-icon.png",
+  "author": "kevinnhou",
+  "license": "MIT",
+  "commands": [
+    {
+      "name": "index",
+      "title": "Query.",
+      "description": "Judge a man by his questions rather than by his answers.",
+      "mode": "view"
+    }
+  ],
+  "dependencies": {
+    "@ai-sdk/google": "^1.2.18",
+    "@raycast/api": "^1.98.5",
+    "@raycast/utils": "^1.19.1",
+    "ai": "^4.3.16",
+    "zod": "^3.24.4"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.9.4",
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
+    "@types/node": "22.13.10",
+    "@types/react": "19.0.10",
+    "typescript": "^5.8.2"
+  },
+  "scripts": {
+    "build": "ray build",
+    "dev": "ray develop",
+    "prepublishOnly": "echo \"\\n\\nIt seems like you are trying to publish the Raycast extension to npm.\\n\\nIf you did intend to publish it to npm, remove the \\`prepublishOnly\\` script and rerun \\`npm publish\\` again.\\nIf you wanted to publish it to the Raycast Store instead, use \\`npm run publish\\` instead.\\n\\n\" && exit 1",
+    "publish": "npx @raycast/api@latest publish",
+    "commitlint": "commitlint --edit",
+    "prepare": "npx husky install"
+  },
+  "lint-staged": {
+    "*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}": [
+      "biome check --files-ignore-unknown=true",
+      "biome check --write --no-errors-on-unmatched",
+      "biome check --write --organize-imports-enabled=false --no-errors-on-unmatched",
+      "biome check --write --unsafe --no-errors-on-unmatched",
+      "biome format --write --no-errors-on-unmatched",
+      "biome lint --write --no-errors-on-unmatched"
+    ],
+    "*": ["biome check --no-errors-on-unmatched --files-ignore-unknown=true"]
+  },
+  "preferences": [
+    {
+      "name": "geminiApiKey",
+      "title": "Gemini API Key",
+      "description": "API Key - Google Gemini",
+      "type": "password",
+      "required": true
+    }
+  ]
+}
