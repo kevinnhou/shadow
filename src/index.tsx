@@ -24,6 +24,7 @@ interface Preferences {
 interface FormValues {
   query: string
   image: string[]
+  depth: string
 }
 
 const preferences = getPreferenceValues<Preferences>()
@@ -57,6 +58,7 @@ export default function Query() {
     initialValues: {
       query: "",
       image: [],
+      depth: "quick",
     },
     async onSubmit(values) {
       const RATE_LIMIT_MS = 5000
@@ -163,6 +165,11 @@ export default function Query() {
         storeValue={false}
         {...itemProps.image}
       />
+      <Form.Dropdown title="Depth" {...itemProps.depth}>
+        <Form.Dropdown.Item value="quick" title="Quick" />
+        <Form.Dropdown.Item value="balanced" title="Balanced" />
+        <Form.Dropdown.Item value="deep" title="Deep" />
+      </Form.Dropdown>
     </Form>
   )
 }
