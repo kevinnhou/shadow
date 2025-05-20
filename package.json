@@ -13,6 +13,13 @@
       "description": "Judge a man by his questions rather than by his answers.",
       "mode": "view",
       "main": "src/query.tsx"
+    },
+    {
+      "name": "quick-query",
+      "title": "Quick Query",
+      "description": "Judge a man by his questions rather than by his answers.",
+      "mode": "view",
+      "main": "src/quick-query.tsx"
     }
   ],
   "dependencies": {
@@ -55,6 +62,13 @@
       "title": "Gemini API Key",
       "description": "Google Gemini API Key",
       "type": "password",
+      "required": true
+    },
+    {
+      "name": "imagesDirectory",
+      "title": "Images Directory",
+      "description": "Images Directory for Quick Queries",
+      "type": "textfield",
       "required": true
     }
   ]
