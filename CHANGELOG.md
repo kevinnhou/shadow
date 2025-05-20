@@ -1,5 +1,11 @@
 # shadow Changelog
 
+## [[Added Community Guidelines]](https://github.com/kevinnhou/shadow/pull/2) - 2025-05-20
+
+- Add CODE_OF_CONDUCT.md
+- Add LICENSE.md
+- Add [#1](https://github.com/kevinnhou/shadow/pull/1) and [#2](https://github.com/kevinnhou/shadow/pull/2) to CHANGELOG.md
+
 ## [[Added Model Depth Options]](https://github.com/kevinnhou/shadow/pull/1) - 2025-05-20
 
 - Add support for switching between Gemini models.
