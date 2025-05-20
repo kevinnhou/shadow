@@ -68,6 +68,13 @@
       "name": "imagesDirectory",
       "title": "Images Directory",
       "description": "Images Directory for Quick Queries",
+      "type": "directory",
+      "required": true
+    },
+    {
+      "name": "quickQuery",
+      "title": "Quick Query",
+      "description": "Query for Quick Queries",
       "type": "textfield",
       "required": true
     }
