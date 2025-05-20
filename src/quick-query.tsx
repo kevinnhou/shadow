@@ -2,7 +2,7 @@ import fs from "node:fs"
 import path from "node:path"
 import { useEffect, useState } from "react"
 
-import { createGoogleGenerativeAI } from "@ai-sdk/google"
+import type { GoogleGenerativeAIProviderOptions } from "@ai-sdk/google"
 import {
   Action,
   ActionPanel,
@@ -12,15 +12,18 @@ import {
   getPreferenceValues,
   showToast,
 } from "@raycast/api"
-import { generateText } from "ai"
+
+import { queryAI } from "./utils/ai"
 
 interface Preferences {
   geminiApiKey: string
   imagesDirectory: string
+  quickQuery: string
 }
 
 const preferences = getPreferenceValues<Preferences>()
 const imageDirectory = preferences.imagesDirectory
+const quickQuery = preferences.quickQuery
 
 function getLatestPng(directoryPath: string): string | null {
   try {
@@ -48,39 +51,19 @@ async function getResponse(imagePath: string): Promise<string | null> {
     style: Toast.Style.Animated,
   })
 
-  const google = createGoogleGenerativeAI({
-    apiKey: preferences.geminiApiKey,
-  })
-
-  const query = "Solve the following question. Answer in Markdown."
+  const providerOpts: GoogleGenerativeAIProviderOptions = {
+    thinkingConfig: {
+      thinkingBudget: 12640,
+      includeThoughts: true,
+    },
+  }
 
   try {
-    const { text } = await generateText({
-      model: google("gemini-2.5-flash-preview-04-17"),
-      messages: [
-        {
-          role: "user",
-          content: [
-            {
-              type: "text",
-              text: query,
-            },
-            {
-              type: "image",
-              image: fs.readFileSync(imagePath),
-            },
-          ],
-        },
-      ],
-      providerOptions: {
-        google: {
-          thinkingConfig: {
-            thinkingBudget: 2428,
-            includeThoughts: true,
-          },
-          taskType: "QUESTION_ANSWERING",
-        },
-      },
+    const text = await queryAI({
+      query: quickQuery,
+      imagePath: imagePath,
+      geminiApiKey: preferences.geminiApiKey,
+      providerOptions: providerOpts,
     })
 
     showToast({

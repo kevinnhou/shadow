@@ -1,9 +1,4 @@
-import fs from "node:fs"
-
-import {
-  type GoogleGenerativeAIProviderOptions,
-  createGoogleGenerativeAI,
-} from "@ai-sdk/google"
+import type { GoogleGenerativeAIProviderOptions } from "@ai-sdk/google"
 import {
   Action,
   ActionPanel,
@@ -14,8 +9,8 @@ import {
 } from "@raycast/api"
 import { FormValidation, useForm } from "@raycast/utils"
 
-import { generateText } from "ai"
 import { useEffect, useState } from "react"
+import { queryAI } from "./utils/ai"
 
 interface Preferences {
   geminiApiKey: string
@@ -31,7 +26,6 @@ const preferences = getPreferenceValues<Preferences>()
 
 export default function Query() {
   const [response, setResponse] = useState<string | null>(null)
-  const [lastRequestTime, setLastRequestTime] = useState<number>(0)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [initialQuery, setInitialQuery] = useState<string | undefined>(
     undefined,
@@ -61,80 +55,34 @@ export default function Query() {
       depth: "balanced",
     },
     async onSubmit(values) {
-      const RATE_LIMIT_MS = 5000
-      const now = Date.now()
-
-      if (now - lastRequestTime < RATE_LIMIT_MS) {
-        setResponse(
-          `Rate limit exceeded. Please wait ${Math.ceil(
-            (lastRequestTime + RATE_LIMIT_MS - now) / 1000,
-          )} seconds before making another request.`,
-        )
-        return
-      }
-
-      setLastRequestTime(now)
       setIsLoading(true)
 
-      const google = createGoogleGenerativeAI({
-        apiKey: preferences.geminiApiKey,
-      })
-
-      let modelName = "gemini-2.5-flash-preview-04-17"
-      let providerOpts:
-        | {
-            google?: GoogleGenerativeAIProviderOptions
-          }
-        | undefined = {
-        google: {
-          thinkingConfig: {
-            thinkingBudget: 5426,
-          },
+      let providerOpts: GoogleGenerativeAIProviderOptions | undefined = {
+        thinkingConfig: {
+          thinkingBudget: 5426,
         },
       }
 
       if (values.depth === "quick") {
-        modelName = "gemini-2.0-flash"
-        providerOpts = undefined
+        providerOpts = {
+          thinkingConfig: {
+            thinkingBudget: 1000,
+          },
+        }
       } else if (values.depth === "deep") {
         providerOpts = {
-          google: {
-            thinkingConfig: {
-              thinkingBudget: 18240,
-              includeThoughts: true,
-            },
+          thinkingConfig: {
+            thinkingBudget: 18240,
+            includeThoughts: true,
           },
         }
       }
 
       try {
-        const messages: {
-          role: "user"
-          content: (
-            | { type: "text"; text: string }
-            | { type: "image"; image: Buffer }
-          )[]
-        }[] = [
-          {
-            role: "user",
-            content: [
-              { type: "text", text: `${values.query}. Answer in markdown.` },
-            ],
-          },
-        ]
-
-        if (values.image && values.image.length > 0) {
-          messages[0].content.push({
-            type: "image",
-            image: fs.readFileSync(values.image[0] as string),
-          })
-        }
-
-        const { text } = await generateText({
-          model: google(
-            modelName as "gemini-2.0-flash" | "gemini-2.5-flash-preview-04-17",
-          ),
-          messages: messages,
+        const text = await queryAI({
+          query: values.query,
+          imagePath: values.image?.[0],
+          geminiApiKey: preferences.geminiApiKey,
           providerOptions: providerOpts,
         })
 
