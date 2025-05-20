@@ -2,16 +2,17 @@
   "$schema": "https://www.raycast.com/schemas/extension.json",
   "name": "shadow",
   "title": "shadow",
-  "description": "silent, invisible and undetectable",
+  "description": "personalised utilities",
   "icon": "extension-icon.png",
   "author": "kevinnhou",
   "license": "MIT",
   "commands": [
     {
-      "name": "index",
-      "title": "Query.",
+      "name": "query",
+      "title": "Query",
       "description": "Judge a man by his questions rather than by his answers.",
-      "mode": "view"
+      "mode": "view",
+      "main": "src/query.tsx"
     }
   ],
   "dependencies": {
@@ -52,7 +53,7 @@
     {
       "name": "geminiApiKey",
       "title": "Gemini API Key",
-      "description": "API Key - Google Gemini",
+      "description": "Google Gemini API Key",
       "type": "password",
       "required": true
     }
